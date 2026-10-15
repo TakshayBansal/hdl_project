@@ -1,0 +1,22 @@
+# environment and caches
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.ipynb_checkpoints/
+
+# Windows download marker
+*:Zone.Identifier
+
+# archives made for Colab upload
+jcsd.zip
+profiles.zip
+
+# large or regenerable artifacts
+results/
+quality/
+accept/
+*.pt
+*.safetensors
+*.bin
+.cache/

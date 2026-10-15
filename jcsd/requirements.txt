@@ -1,0 +1,14 @@
+# Pin the exact versions you use on Colab/Kaggle and record them in every results file.
+torch
+transformers
+accelerate
+datasets
+evaluate
+rouge_score
+sacrebleu
+numpy
+scipy
+pandas
+matplotlib
+tqdm
+pytest
