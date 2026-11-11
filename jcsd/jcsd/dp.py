@@ -62,3 +62,11 @@ def expected_tokens(tree, acc_row_fn, L=0):
         for k, ch in enumerate(node, start=1):
             stack.append((ch, f * acc_row_fn(l, k), l + 1))
     return tot
+
+
+def chain(gamma):
+    """A chain of gamma drafted tokens below the root (gamma + 1 nodes)."""
+    t = []
+    for _ in range(gamma):
+        t = [t]
+    return t

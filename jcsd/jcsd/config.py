@@ -1,11 +1,19 @@
 from dataclasses import dataclass, asdict
 import json, os
 
+# model pairs (spec 6.3). chat=True uses the tokenizer's chat template (instruction-tuned pairs).
+PAIRS = {
+    'A': dict(draft='EleutherAI/pythia-160m', target='EleutherAI/pythia-2.8b', chat=False),
+    'A410': dict(draft='EleutherAI/pythia-410m', target='EleutherAI/pythia-2.8b', chat=False),
+    'B': dict(draft='Qwen/Qwen2.5-0.5B-Instruct', target='Qwen/Qwen2.5-3B-Instruct', chat=True),
+}
+
 
 @dataclass
 class Cfg:
     draft: str = 'EleutherAI/pythia-410m'
     target: str = 'EleutherAI/pythia-2.8b'
+    chat: bool = False
     dtype: str = 'float16'
     device: str = 'cuda'
     attn: str = 'sdpa'          # try 'eager' when debugging tree attention
@@ -24,3 +32,17 @@ class Cfg:
         os.makedirs(self.out_dir, exist_ok=True)
         with open(os.path.join(self.out_dir, name), 'w') as f:
             json.dump(asdict(self), f, indent=2)
+
+
+def pair_name(cfg):
+    return cfg.target.split('/')[-1] + '__' + cfg.draft.split('/')[-1]
+
+
+def cfg_for_pair(key, **kw):
+    p = dict(PAIRS[key])
+    p.update(kw)
+    return Cfg(**p)
+
+
+def setting_name(mode, alpha=None):
+    return mode if mode in ('p', 'q') else 'a%.2f' % alpha
