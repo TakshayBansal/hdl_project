@@ -93,7 +93,7 @@ if cas:
         s = np.asarray(r['acc']['p1_samples'])
         if len(s):
             ax[1].hist(s, bins=40, range=(0, 1), histtype='step', lw=2, color=C[i], density=True,
-                       label='alpha=%.2f' % r['alpha'])
+                       label='alpha=%g' % r['alpha'])
     ax[1].set_xlabel('per-position P(first child accepted) = 1 - TV(pi, q)'); ax[1].set_ylabel('density')
     ax[1].set_title('Bimodality of p_1 (positional assumption)'); ax[1].legend(fontsize=7)
     save(fig, 'fig3_acceptance%s.png' % tsuf)

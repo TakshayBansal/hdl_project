@@ -11,6 +11,7 @@ __pycache__/
 # archives made for Colab upload
 jcsd.zip
 profiles.zip
+artifacts*.zip
 
 # large or regenerable artifacts
 results/

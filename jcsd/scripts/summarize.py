@@ -6,7 +6,7 @@ import argparse, glob, os
 import numpy as np
 from scipy.stats import spearmanr
 from _common import add_pair_args, cfg_from
-from jcsd.config import pair_name
+from jcsd.config import pair_name, setting_name
 from jcsd.paths import load_quality, load_json
 from jcsd.search import evaluate_tree
 from jcsd.tasks import paired_bootstrap_ci
@@ -27,7 +27,7 @@ if cas:
     al = [r['alpha'] for r in cas]
     p1 = [r['acc']['pk'][0] for r in cas]
     rho, pv = spearmanr(al, p1)
-    print('\nH1  p_1 vs alpha:', ' '.join('%.2f:%.3f' % x for x in zip(al, p1)))
+    print('\nH1  p_1 vs alpha:', ' '.join('%g:%.3f' % x for x in zip(al, p1)))
     print('    Spearman rho = %.3f (p = %.3g); monotone non-decreasing: %s'
           % (rho, pv, all(b >= a_ - 1e-3 for a_, b in zip(p1, p1[1:]))))
     if 'p' in Q:
@@ -36,7 +36,7 @@ if cas:
     for r in cas:
         s = np.asarray(r['acc']['p1_samples'])
         if len(s):
-            print('    alpha %.2f: per-position p_1 mean %.3f, share > 0.95: %.2f, share < 0.5: %.2f'
+            print('    alpha %g: per-position p_1 mean %.3f, share > 0.95: %.2f, share < 0.5: %.2f'
                   % (r['alpha'], s.mean(), (s > 0.95).mean(), (s < 0.5).mean()))
 
 searches = sorted(glob.glob(os.path.join(R, 'search', '*_%s_%s%s.json' % (pair, a.task, tsuf))))
@@ -56,7 +56,7 @@ for f in searches:
     print('\nH4  [%s] predicted joint vs sequential' % S['hw'])
     for tol, r in S['by_tol'].items():
         if r.get('feasible'):
-            print('    tol %-5s joint a=%.2f %.3fx | sequential a=%.2f %.3fx | ratio %.3f | fc chain %.3fx | sequoia %.3fx'
+            print('    tol %-5s joint a=%g %.3fx | sequential a=%g %.3fx | ratio %.3f | fc chain %.3fx | sequoia %.3fx'
                   % (tol, r['joint']['alpha'], r['joint']['speedup'], r['sequential']['alpha'],
                      r['sequential']['speedup'], r['joint_over_sequential'], r['fc_chain']['speedup'],
                      S['sequoia']['speedup']))
@@ -73,7 +73,7 @@ if len(S_by_hw) > 1:
             if tol is None:
                 cells.append('   n/a'); continue
             c = next(c for c in Ss['configs'] if c['name'] == 'joint_tol%g' % float(tol))
-            acc = Q['a%.2f' % c['alpha']]['acc']['pk']      # acceptance is hardware independent
+            acc = Q[setting_name('cascade', c['alpha'])]['acc']['pk']      # acceptance is hardware independent
             ev = evaluate_tree(c['tree'], acc, load_json(Sd['profile']), **Sd['cost'])
             own = Sd['by_tol'][tol]['joint']['speedup'] if Sd['by_tol'][tol].get('feasible') else np.nan
             cells.append('%.3f (%+.1f%%)' % (ev['speedup'], 100 * (ev['speedup'] / own - 1)))

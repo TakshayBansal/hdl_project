@@ -45,4 +45,11 @@ def cfg_for_pair(key, **kw):
 
 
 def setting_name(mode, alpha=None):
-    return mode if mode in ('p', 'q') else 'a%.2f' % alpha
+    # two decimals as before (a0.30), more only when needed (a0.995): '%.2f' would map 0.995 and
+    # 0.998 onto the existing a0.99 / a1.00 files, which run_quality then skips as done
+    if mode in ('p', 'q'):
+        return mode
+    s = '%.2f' % alpha
+    if abs(float(s) - alpha) > 1e-9:
+        s = ('%.6f' % alpha).rstrip('0')
+    return 'a' + s

@@ -90,7 +90,7 @@ for x in alphas:
     per_alpha[x] = dict(alpha=x, quality=q_by_alpha[x], quality_ci=alpha_recs[x]['ci'],
                         diff_vs_p=[d, lo, hi], p1=alpha_recs[x]['acc']['pk'][0], best=b,
                         chains={str(g): c for g, c in chains.items()}, surface=surf)
-    print('alpha %.2f Q=%.4f (vs p %+.4f [%+.4f,%+.4f]) p1=%.3f | best n=%d d=%d G=%.2f speedup %.3f'
+    print('alpha %-5g Q=%.4f (vs p %+.4f [%+.4f,%+.4f]) p1=%.3f | best n=%d d=%d G=%.2f speedup %.3f'
           % (x, q_by_alpha[x], d, lo, hi, per_alpha[x]['p1'], b['n'], b['d'], b['G'], b['speedup']))
 
 sequoia = best_for_acc(acc_ref, cfg, prof, **cost_kw)
@@ -132,7 +132,7 @@ for tol in a.tols:
     configs.append(dict(name='fc_chain_tol' + t, mode='cascade', alpha=fc[0], tree=chain(fc[1]),
                         predicted=rec['fc_chain']['speedup'],
                         G=per_alpha[fc[0]]['chains'][str(fc[1])]['G']))
-    print('tol %-5g q_min %.4f feasible %s | joint a=%.2f (n=%d,d=%d) %.3f | sequential a=%.2f %.3f | fc chain a=%.2f g=%d %.3f | joint/seq %.3f'
+    print('tol %-5g q_min %.4f feasible %s | joint a=%g (n=%d,d=%d) %.3f | sequential a=%g %.3f | fc chain a=%g g=%d %.3f | joint/seq %.3f'
           % (tol, qmin, feas, aj, J['n'], J['d'], J['speedup'], aseq, seq[aseq]['speedup'],
              fc[0], fc[1], rec['fc_chain']['speedup'], rec['joint_over_sequential']))
 
