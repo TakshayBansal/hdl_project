@@ -1,5 +1,6 @@
 import json, os, statistics, subprocess
 import torch
+from jcsd.tree import crop_to
 
 
 def _sync(device):
@@ -54,7 +55,7 @@ def time_forward(model, ctx_len, n, device, masked=False, reps=30, warm=5):
 
     def fn():
         model(input_ids=chunk, past_key_values=cache, use_cache=True, **kw)
-        cache.crop(ctx_len)
+        crop_to(cache, ctx_len)
     return cuda_time(fn, warm=warm, reps=reps, device=device)
 
 
@@ -69,7 +70,7 @@ def time_ar_step(target, ctx_len, V, T, device, reps=30, warm=5):
     def fn():
         lg = target(input_ids=tok, past_key_values=cache, use_cache=True).logits[0, -1, :V].float()
         int(torch.multinomial(torch.softmax(lg / T, -1), 1).item())
-        cache.crop(ctx_len)
+        crop_to(cache, ctx_len)
     return cuda_time(fn, warm=warm, reps=reps, device=device)
 
 

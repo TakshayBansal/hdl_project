@@ -22,13 +22,14 @@ Full GPU pipeline: notebooks/jcsd_pipeline.ipynb (Colab or Kaggle, no Drive). Ru
 | Module | State |
 |---|---|
 | config, cascade, verify, dp, search, tasks, stats, paths | done; numpy parts tested (DP, search, offline pipeline) |
-| accept (verify_batch, AcceptCounter) | written + CPU tests (test_accept.py); run them |
-| quality (batched left-padded sampler, inline acceptance) | written + CPU tests (test_quality_cpu.py); run them |
-| tree, decode_tree (TreeDecoder, autoregressive) | written + CPU tests (test_tree_decoder_cpu.py); run them |
+| accept (verify_batch, AcceptCounter) | CPU tests pass |
+| quality (batched left-padded sampler, inline acceptance) | CPU tests pass |
+| tree, decode_tree (TreeDecoder, autoregressive) | CPU tests pass (incl. slow chi-square); GPU check_tree_attention not yet run |
 | scripts: run_profile, check_tree_attention, run_quality, run_search, run_e2e, calibrate, make_figures, summarize | written; CPU-only ones (search, calibrate, figures, summarize) tested on synthetic artifacts |
 | GPU results | NONE YET. Every number in the final report must come from these scripts. |
 
-The torch modules were written without being executed (the authoring sandbox had no torch). The test files are the
+Full CPU suite (83 tests) passes on torch 2.15 + transformers 5.24 (2026-11-24). Cache crops go through tree.crop_to
+(transformers 5 rejects a positive crop()). The test files are the
 contract: if a test fails, fix the module, not the test (unless the test itself is shown wrong).
 
 ## Decisions

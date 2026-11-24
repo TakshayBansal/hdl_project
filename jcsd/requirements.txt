@@ -1,6 +1,7 @@
 # Pin the exact versions you use on Colab/Kaggle and record them in every results file.
 torch
-transformers
+# >=4.56: dtype= kwarg; <5.40: past_key_values= kwarg is removed there (renamed cache=)
+transformers>=4.56,<5.40
 accelerate
 datasets
 evaluate

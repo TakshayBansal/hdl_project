@@ -56,6 +56,15 @@ def cache_len(cache):
     return cache.get_seq_length()
 
 
+def crop_to(cache, length):
+    """Truncate `cache` to its first `length` positions. A negative argument (remove that many
+    tokens) means the same on the old DynamicCache.crop(max_length) and on transformers >= 5,
+    which rejects a positive one; crop(0) would empty the old cache, so skip a no-op."""
+    extra = cache.get_seq_length() - length
+    if extra > 0:
+        cache.crop(-extra)
+
+
 def keep_path(cache, ctx, path):
     """After a verify pass appended n entries after `ctx` cached ones, keep only the nodes in
     `path` (root first, tree indices) and move them to consecutive slots ctx, ctx+1, ...

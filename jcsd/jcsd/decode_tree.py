@@ -15,7 +15,7 @@ import torch
 from jcsd.cascade import probs, tokenv3_target
 from jcsd.verify import gumbel_topk
 from jcsd.accept import verify_batch
-from jcsd.tree import flatten, ancestor_allow, additive_mask, keep_path
+from jcsd.tree import flatten, ancestor_allow, additive_mask, keep_path, crop_to
 from jcsd.dp import chain  # noqa: F401  (re-exported)
 
 
@@ -91,7 +91,7 @@ class TreeDecoder:
             top = gumbel_topk(qs[idx], kmax, gen)
             toks[childs] = top[rows, ranks]
         if self.depth >= 2:
-            dcache.crop(d_len)
+            crop_to(dcache, d_len)
         return qs, toks
 
     @torch.no_grad()

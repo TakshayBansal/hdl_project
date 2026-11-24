@@ -16,7 +16,7 @@ def tiny(seed=0, layers=2, hidden=32, sharp=6.0, attn='eager'):
         pass
     m = GPTNeoXForCausalLM(c).eval()
     with torch.no_grad():
-        m.embed_out.weight.mul_(sharp)
+        m.get_output_embeddings().weight.mul_(sharp)   # embed_out (4.x) / lm_head (5.x)
     return m
 
 
