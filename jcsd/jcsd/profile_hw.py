@@ -74,15 +74,18 @@ def time_ar_step(target, ctx_len, V, T, device, reps=30, warm=5):
     return cuda_time(fn, warm=warm, reps=reps, device=device)
 
 
-def env_info():
+def env_info(device=None):
+    """Library versions and the hardware actually used: `device` (default: cuda if available).
+    A CPU run on a GPU machine is labelled 'cpu', not with the GPU's name."""
     info = dict(torch=torch.__version__)
     try:
         import transformers
         info['transformers'] = transformers.__version__
     except Exception:
         pass
-    if torch.cuda.is_available():
-        info['hw'] = torch.cuda.get_device_name()
+    on_gpu = torch.cuda.is_available() if device is None else str(device).startswith('cuda')
+    if on_gpu:
+        info['hw'] = torch.cuda.get_device_name(torch.device(device) if device is not None else None)
         try:
             info['nvidia_smi'] = subprocess.run(['nvidia-smi'], capture_output=True, text=True).stdout
         except Exception:
@@ -98,7 +101,7 @@ def profile(draft, target, cfg, ctx_len=256, sizes=(1, 2, 4, 8, 16, 32, 64, 128,
     cuda = str(dev).startswith('cuda')
     prof = dict(ctx_len=ctx_len, sizes=list(sizes), masked=masked, reps=reps,
                 t_verify=[], t_draft_level=[], peak_mem_gb=[], raw_verify={}, raw_draft={})
-    prof.update(env_info())
+    prof.update(env_info(dev))
     for n in sizes:
         if cuda:
             torch.cuda.reset_peak_memory_stats()
