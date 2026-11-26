@@ -37,3 +37,26 @@ notebooks/jcsd_pipeline.ipynb   the whole pipeline on Colab / Kaggle
 Methods compared end to end (same decoder, same seeds, interleaved): autoregressive; chain speculative (gamma 3/5/7);
 SEQUOIA (DP tree, exact target); Faster Cascades (best alpha and gamma on a chain); sequential (SEQUOIA tree, then
 best alpha); joint (best alpha with its own DP tree), at each quality tolerance; plus other platforms' joint optima (H3).
+
+## Results (submitted)
+Pythia-160M -> Pythia-2.8B, CNN/DailyMail, NVIDIA Tesla T4 in FP16 (Colab) and FP32 (Kaggle).
+
+| | FP16 | FP32 |
+|---|---|---|
+| Joint (ours), alpha = 0.995 | **1.481x** | 1.375x |
+| Sequential (SEQUOIA tree, then alpha) | 1.405x | 1.185x |
+| SEQUOIA (exact target) | 1.368x | 1.202x |
+| Faster Cascades chain | 1.352x | **1.415x** |
+
+Speedups over autoregressive decoding, 100 test prompts x 3 passes. Full write-up: `report/overleaf/main.tex`.
+
+- `artifacts/` holds every measured result: `profiles/` (hardware latency), `quality/` (Q(alpha), acceptance),
+  `search/` (DP optima), `results/` (end-to-end timings), `calib/` (overhead fit).
+- `report/` holds the figures, LaTeX tables, the H1-H4 summary (`summary.txt`) and the report source.
+
+Regenerate the summary and figures from the stored results (CPU only):
+```
+cd jcsd
+python scripts/summarize.py --root ../artifacts --pair A --task cnndm --tables ../report/tables
+python scripts/make_figures.py --root ../artifacts --pair A --task cnndm --out ../report/figures
+```

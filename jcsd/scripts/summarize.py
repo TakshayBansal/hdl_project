@@ -7,7 +7,7 @@ import numpy as np
 from scipy.stats import spearmanr
 from _common import add_pair_args, cfg_from
 from jcsd.config import pair_name, setting_name
-from jcsd.paths import load_quality, load_json
+from jcsd.paths import load_quality, load_json, stored_path
 from jcsd.search import evaluate_tree
 from jcsd.tasks import paired_bootstrap_ci
 
@@ -74,7 +74,7 @@ if len(S_by_hw) > 1:
                 cells.append('   n/a'); continue
             c = next(c for c in Ss['configs'] if c['name'] == 'joint_tol%g' % float(tol))
             acc = Q[setting_name('cascade', c['alpha'])]['acc']['pk']      # acceptance is hardware independent
-            ev = evaluate_tree(c['tree'], acc, load_json(Sd['profile']), **Sd['cost'])
+            ev = evaluate_tree(c['tree'], acc, load_json(stored_path(R, Sd['profile'])), **Sd['cost'])
             own = Sd['by_tol'][tol]['joint']['speedup'] if Sd['by_tol'][tol].get('feasible') else np.nan
             cells.append('%.3f (%+.1f%%)' % (ev['speedup'], 100 * (ev['speedup'] / own - 1)))
         print('    %-18s' % src, ' | '.join(cells))

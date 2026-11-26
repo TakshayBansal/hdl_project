@@ -11,7 +11,7 @@ import argparse
 import numpy as np
 from _common import add_pair_args, cfg_from
 from jcsd.config import pair_name
-from jcsd.paths import e2e_path, search_path, calib_path, load_json, save_json
+from jcsd.paths import e2e_path, search_path, calib_path, load_json, save_json, stored_path
 from jcsd.search import make_cost, fit_overhead, level_widths, t_ar_of
 from jcsd.stats import depth_matrix
 
@@ -28,7 +28,7 @@ pair = pair_name(cfg)
 T = cfg.temperature
 E = load_json(a.e2e or e2e_path(a.root, a.hw, pair, a.task, T))
 S = load_json(search_path(a.root, a.hw, pair, a.task, T))
-prof = load_json(S['profile'])
+prof = load_json(stored_path(a.root, S['profile']))
 level0 = S['cost'].get('level0', True)
 base = make_cost(prof, 0.0, 0.0, level0)
 

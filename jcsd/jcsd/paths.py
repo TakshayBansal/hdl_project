@@ -46,6 +46,14 @@ def find_profile(root, hw, pair, ctx=None, masked=True):
     return c, load_json(c)
 
 
+def stored_path(root, path):
+    """A path saved inside an artifact (e.g. a search file's 'profile') is relative to the directory
+    the producing script ran in; resolve it against `root` when it does not exist as given."""
+    if os.path.exists(path) or os.path.isabs(path):
+        return path
+    return os.path.join(root, path)
+
+
 def load_json(path):
     with open(path) as f:
         return json.load(f)

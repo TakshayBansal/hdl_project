@@ -43,6 +43,24 @@ def save(fig, name):
     print('wrote', p)
 
 
+A1 = 1e-4          # where alpha = 1 (draft only, 1 - alpha = 0) is drawn on the log axis
+
+
+def ax_x(alpha):
+    """x coordinate for alpha: 1 - alpha on a log axis, with alpha = 1 at the sentinel A1."""
+    return np.maximum(1.0 - np.asarray(alpha, dtype=float), A1)
+
+
+def alpha_axis(ax):
+    ax.set_xscale('log')
+    ticks = [1, 0.1, 0.01, 0.001, A1]
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(['0', '0.9', '0.99', '0.999', '1 (q)'])
+    ax.minorticks_off()
+    ax.invert_xaxis()                     # alpha grows to the right
+    ax.set_xlabel('alpha  (axis: 1 - alpha, log scale)')
+
+
 def skip(what, why):
     print('skip %s: %s' % (what, why))
 
@@ -71,22 +89,22 @@ if cas:
     q = np.array([r['quality'] for r in cas])
     lo = np.array([r['ci'][0] for r in cas]); hi = np.array([r['ci'][1] for r in cas])
     fig, ax = plt.subplots(figsize=(4.6, 3.3))
-    ax.fill_between(al, lo, hi, color=C[0], alpha=0.18, lw=0)
-    ax.plot(al, q, marker='o', color=C[0], label='TokenV3 cascade')
+    ax.fill_between(ax_x(al), lo, hi, color=C[0], alpha=0.18, lw=0)
+    ax.plot(ax_x(al), q, marker='o', color=C[0], label='TokenV3 cascade')
     for key, c, ls, lab in (('p', C[1], '--', 'target only (p)'), ('q', C[2], ':', 'draft only (q)')):
         if key in Q:
             ax.axhline(Q[key]['quality'], color=c, ls=ls, lw=1.5, label=lab)
-    ax.set_xlabel('alpha'); ax.set_ylabel('ROUGE-2' if a.task == 'cnndm' else 'accuracy')
+    alpha_axis(ax); ax.set_ylabel('ROUGE-2' if a.task == 'cnndm' else 'accuracy')
     ax.set_title('Quality vs alpha (95% bootstrap CI)'); ax.legend(fontsize=7)
     save(fig, 'fig2_quality%s.png' % tsuf)
 
     fig, ax = plt.subplots(1, 2, figsize=(9, 3.4))
     pk = np.array([r['acc']['pk'][:4] for r in cas])
     for k in range(4):
-        ax[0].plot(al, pk[:, k], marker=MK[k], color=C[k], label='p_%d' % (k + 1))
+        ax[0].plot(ax_x(al), pk[:, k], marker=MK[k], color=C[k], label='p_%d' % (k + 1))
     if 'p' in Q:
         ax[0].axhline(Q['p']['acc']['pk'][0], color=INK2, ls='--', lw=1, label='p_1, exact target')
-    ax[0].set_xlabel('alpha'); ax[0].set_ylabel('acceptance probability'); ax[0].legend(fontsize=7)
+    alpha_axis(ax[0]); ax[0].set_ylabel('acceptance probability'); ax[0].legend(fontsize=7, loc='upper left')
     ax[0].set_title('Acceptance vector vs alpha (H1)')
     pick = [cas[0], cas[len(cas) // 2], cas[-2] if len(cas) > 2 else cas[-1]]
     for i, r in enumerate(pick):
@@ -103,41 +121,44 @@ else:
 # 4-5. search -------------------------------------------------------------------------
 searches = sorted(glob.glob(os.path.join(R, 'search', '*_%s_%s%s.json' % (pair, a.task, tsuf))))
 if searches:
-    S = load_json(searches[0])
-    al = sorted(S['per_alpha'], key=float)
-    pick = [al[0], al[len(al) // 2], al[-1]]
-    fig, ax = plt.subplots(1, 3, figsize=(11, 3.2), sharey=True)
-    for x, key in zip(ax, pick):
-        surf = S['per_alpha'][key]['surface']
-        ds = sorted({int(k.split(',')[0]) for k in surf}); ns = sorted({int(k.split(',')[1]) for k in surf})
-        M = np.full((len(ds), len(ns)), np.nan)
-        for k, v in surf.items():
-            d, n = map(int, k.split(','))
-            M[ds.index(d), ns.index(n)] = v
-        im = x.imshow(M, origin='lower', aspect='auto', cmap='Blues')
-        b = S['per_alpha'][key]['best']
-        ni = int(np.argmin([abs(np.log(v / b['n'])) for v in ns]))      # nearest grid size
-        di = int(np.argmin([abs(v - b['d']) for v in ds]))
-        x.plot(ni, di, marker='*', ms=12, color=C[1], mec='white')
-        x.set_xticks(range(len(ns))); x.set_xticklabels(ns, rotation=90, fontsize=6)
-        x.set_yticks(range(len(ds))); x.set_yticklabels(ds, fontsize=6)
-        x.set_xlabel('tree size n'); x.set_title('alpha=%s: best n=%d, d=%d, %.2fx' % (key, b['n'], b['d'], b['speedup']), fontsize=8)
-        x.grid(False)
-        fig.colorbar(im, ax=x, fraction=0.046)
-    ax[0].set_ylabel('depth cap d')
-    fig.suptitle('Predicted speedup surface (%s); star = optimum' % S['hw'], y=1.03)
-    save(fig, 'fig4_surface%s.png' % tsuf)
+    for sf in searches:
+        S = load_json(sf)
+        al = sorted(S['per_alpha'], key=float)
+        ja = next((str(r['joint']['alpha']) for r in S['by_tol'].values() if r.get('feasible')), al[len(al) // 2])
+        below1 = [k for k in al if float(k) < 1.0]
+        pick = list(dict.fromkeys([al[0], ja if ja in S['per_alpha'] else al[len(al) // 2], below1[-1]]))
+        fig, ax = plt.subplots(1, 3, figsize=(11, 3.2), sharey=True)
+        for x, key in zip(ax, pick):
+            surf = S['per_alpha'][key]['surface']
+            ds = sorted({int(k.split(',')[0]) for k in surf}); ns = sorted({int(k.split(',')[1]) for k in surf})
+            M = np.full((len(ds), len(ns)), np.nan)
+            for k, v in surf.items():
+                d, n = map(int, k.split(','))
+                M[ds.index(d), ns.index(n)] = v
+            im = x.imshow(M, origin='lower', aspect='auto', cmap='Blues')
+            b = S['per_alpha'][key]['best']
+            ni = int(np.argmin([abs(np.log(v / b['n'])) for v in ns]))      # nearest grid size
+            di = int(np.argmin([abs(v - b['d']) for v in ds]))
+            x.plot(ni, di, marker='*', ms=12, color=C[1], mec='white')
+            x.set_xticks(range(len(ns))); x.set_xticklabels(ns, rotation=90, fontsize=6)
+            x.set_yticks(range(len(ds))); x.set_yticklabels(ds, fontsize=6)
+            x.set_xlabel('tree size n'); x.set_title('alpha=%s: best n=%d, d=%d, %.2fx' % (key, b['n'], b['d'], b['speedup']), fontsize=8)
+            x.grid(False)
+            fig.colorbar(im, ax=x, fraction=0.046)
+        ax[0].set_ylabel('depth cap d')
+        fig.suptitle('Predicted speedup surface (%s); star = optimum' % S['hw'], y=1.03)
+        save(fig, 'fig4_surface_%s%s.png' % (S['hw'], tsuf))
 
     fig, ax = plt.subplots(1, 3, figsize=(11, 3.2))
     for i, f in enumerate(searches[:8]):
         S = load_json(f)
         al = sorted(S['per_alpha'], key=float)
-        x = [float(k) for k in al]
+        x = ax_x([float(k) for k in al])
         best = [S['per_alpha'][k]['best'] for k in al]
         for axx, vals in zip(ax, ([b['d'] for b in best], [max(b['widths']) for b in best], [b['n'] for b in best])):
             axx.plot(x, vals, marker=MK[i], color=C[i], label=S['hw'])
     for axx, t in zip(ax, ['optimal depth', 'max level width', 'node count']):
-        axx.set_xlabel('alpha'); axx.set_title(t + ' (H2)')
+        alpha_axis(axx); axx.set_title(t + ' (H2)')
     ax[0].legend(fontsize=7)
     save(fig, 'fig5_tree_vs_alpha%s.png' % tsuf)
 else:
@@ -146,19 +167,20 @@ else:
 # 6-8. end-to-end ---------------------------------------------------------------------
 e2es = sorted(glob.glob(os.path.join(R, 'results', 'e2e_*_%s_%s%s*.json' % (pair, a.task, tsuf))))
 if e2es:
-    E = load_json(e2es[0])
-    fig, ax = plt.subplots(figsize=(5.2, 3.6))
-    fam = [('ar', 'autoregressive'), ('chain', 'chain spec.'), ('sequoia', 'SEQUOIA'),
-           ('fc_chain', 'Faster Cascades'), ('seq_', 'sequential'), ('joint', 'joint (ours)')]
-    for i, (pre, lab) in enumerate(fam):
-        pts = [(m['speedup'], m['quality'][0], m['quality'][1], m['quality'][2])
-               for n, m in E['methods'].items() if n.startswith(pre) and '@' not in n]
-        if pts:
-            s, qq, l, h = map(np.array, zip(*pts))
-            ax.errorbar(s, qq, yerr=[qq - l, h - qq], fmt=MK[i], color=C[i], label=lab, ms=6, lw=1, capsize=2)
-    ax.set_xlabel('measured speedup vs autoregressive'); ax.set_ylabel('quality')
-    ax.set_title('Quality vs speed (%s)' % E['hw']); ax.legend(fontsize=7)
-    save(fig, 'fig6_pareto%s.png' % tsuf)
+    for ef in e2es:
+        E = load_json(ef)
+        fig, ax = plt.subplots(figsize=(5.2, 3.6))
+        fam = [('ar', 'autoregressive'), ('chain', 'chain spec.'), ('sequoia', 'SEQUOIA'),
+               ('fc_chain', 'Faster Cascades'), ('seq_', 'sequential'), ('joint', 'joint (ours)')]
+        for i, (pre, lab) in enumerate(fam):
+            pts = [(m['speedup'], m['quality'][0], m['quality'][1], m['quality'][2])
+                   for n, m in E['methods'].items() if n.startswith(pre) and '@' not in n]
+            if pts:
+                s, qq, l, h = map(np.array, zip(*pts))
+                ax.errorbar(s, qq, yerr=[qq - l, h - qq], fmt=MK[i], color=C[i], label=lab, ms=6, lw=1, capsize=2)
+        ax.set_xlabel('measured speedup vs autoregressive'); ax.set_ylabel('quality')
+        ax.set_title('Quality vs speed (%s)' % E['hw']); ax.legend(fontsize=7, loc='upper left', bbox_to_anchor=(1.01, 1))
+        save(fig, 'fig6_pareto_%s%s.png' % (E['hw'], tsuf))
 
     fig, ax = plt.subplots(figsize=(4.2, 4))
     allv = []
@@ -196,10 +218,13 @@ if e2es:
         im = ax.imshow(M, cmap='Blues'); ax.grid(False)
         for i in range(len(hws)):
             for j in range(len(hws)):
-                if not np.isnan(M[i, j]):
-                    loss = 1 - M[i, j] / M[j, j] if not np.isnan(M[j, j]) else np.nan
-                    ax.text(j, i, '%.2fx\n(%+.0f%%)' % (M[i, j], -100 * loss) if i != j else '%.2fx' % M[i, j],
-                            ha='center', va='center', fontsize=7, color=INK if M[i, j] < np.nanmax(M) * 0.7 else 'white')
+                if np.isnan(M[i, j]):
+                    ax.text(j, i, 'not run', ha='center', va='center', fontsize=7, color=INK2)
+                    continue
+                loss = 1 - M[i, j] / M[j, j] if not np.isnan(M[j, j]) else np.nan
+                lab = '%.2fx' % M[i, j] if i == j else ('%.2fx\n(%+.1f%% vs own)' % (M[i, j], -100 * loss))
+                dark = im.norm(M[i, j]) > 0.55          # text colour follows the cell's shade
+                ax.text(j, i, lab, ha='center', va='center', fontsize=8, color='white' if dark else INK)
         ax.set_xticks(range(len(hws))); ax.set_xticklabels(hws, rotation=30, fontsize=7)
         ax.set_yticks(range(len(hws))); ax.set_yticklabels(hws, fontsize=7)
         ax.set_xlabel('run on'); ax.set_ylabel('optimum taken from')

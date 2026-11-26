@@ -21,3 +21,11 @@ accept/
 *.safetensors
 *.bin
 .cache/
+
+# final measured results submitted with the code (small JSON only)
+!artifacts/
+!artifacts/**/
+!artifacts/**/*.json
+
+# local working notes and build outputs
+report/JCSD_report_overleaf.zip

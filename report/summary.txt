@@ -1,0 +1,128 @@
+=== pythia-2.8b__pythia-160m | cnndm | T=1 ===
+
+H1  p_1 vs alpha: 0:0.666 0.1:0.667 0.2:0.670 0.3:0.674 0.5:0.680 0.7:0.691 0.9:0.695 0.92:0.703 0.95:0.717 0.97:0.723 0.99:0.769 0.995:0.794 0.998:0.826 0.999:0.848 1:1.000
+    Spearman rho = 1.000 (p = 0); monotone non-decreasing: True
+    exact target p_1 = 0.636;  Q(p) = 0.0476  Q(q) = 0.0150
+    alpha 0: per-position p_1 mean 0.664, share > 0.95: 0.23, share < 0.5: 0.27
+    alpha 0.1: per-position p_1 mean 0.665, share > 0.95: 0.23, share < 0.5: 0.27
+    alpha 0.2: per-position p_1 mean 0.670, share > 0.95: 0.24, share < 0.5: 0.27
+    alpha 0.3: per-position p_1 mean 0.674, share > 0.95: 0.25, share < 0.5: 0.27
+    alpha 0.5: per-position p_1 mean 0.677, share > 0.95: 0.24, share < 0.5: 0.25
+    alpha 0.7: per-position p_1 mean 0.686, share > 0.95: 0.25, share < 0.5: 0.23
+    alpha 0.9: per-position p_1 mean 0.695, share > 0.95: 0.21, share < 0.5: 0.19
+    alpha 0.92: per-position p_1 mean 0.703, share > 0.95: 0.22, share < 0.5: 0.18
+    alpha 0.95: per-position p_1 mean 0.715, share > 0.95: 0.20, share < 0.5: 0.15
+    alpha 0.97: per-position p_1 mean 0.724, share > 0.95: 0.20, share < 0.5: 0.13
+    alpha 0.99: per-position p_1 mean 0.768, share > 0.95: 0.19, share < 0.5: 0.07
+    alpha 0.995: per-position p_1 mean 0.792, share > 0.95: 0.19, share < 0.5: 0.05
+    alpha 0.998: per-position p_1 mean 0.823, share > 0.95: 0.19, share < 0.5: 0.02
+    alpha 0.999: per-position p_1 mean 0.849, share > 0.95: 0.20, share < 0.5: 0.01
+    alpha 1: per-position p_1 mean 1.000, share > 0.95: 1.00, share < 0.5: 0.00
+
+H2  [tesla_t4_float16] optimal tree vs alpha
+    alpha 0.0: n= 10 d= 2 widths=[1, 4, 5] G=2.48 pred. speedup 1.277
+    alpha 0.1: n= 10 d= 2 widths=[1, 4, 5] G=2.49 pred. speedup 1.279
+    alpha 0.2: n= 12 d= 2 widths=[1, 4, 7] G=2.54 pred. speedup 1.287
+    alpha 0.3: n= 12 d= 2 widths=[1, 4, 7] G=2.55 pred. speedup 1.290
+    alpha 0.5: n= 10 d= 2 widths=[1, 4, 5] G=2.53 pred. speedup 1.298
+    alpha 0.7: n= 10 d= 2 widths=[1, 4, 5] G=2.56 pred. speedup 1.311
+    alpha 0.9: n= 10 d= 2 widths=[1, 4, 5] G=2.58 pred. speedup 1.319
+    alpha 0.92: n= 10 d= 2 widths=[1, 4, 5] G=2.59 pred. speedup 1.324
+    alpha 0.95: n= 10 d= 2 widths=[1, 4, 5] G=2.62 pred. speedup 1.337
+    alpha 0.97: n= 10 d= 2 widths=[1, 4, 5] G=2.63 pred. speedup 1.341
+    alpha 0.99: n= 12 d= 3 widths=[1, 3, 4, 4] G=3.31 pred. speedup 1.394
+    alpha 0.995: n= 12 d= 3 widths=[1, 3, 4, 4] G=3.40 pred. speedup 1.422
+    alpha 0.998: n= 12 d= 3 widths=[1, 3, 4, 4] G=3.49 pred. speedup 1.456
+    alpha 0.999: n= 23 d= 5 widths=[1, 3, 4, 4, 5, 6] G=4.91 pred. speedup 1.490
+    alpha 1.0: n= 13 d=12 widths=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] G=13.00 pred. speedup 2.033
+    Spearman(alpha, depth) = 0.836   Spearman(alpha, max width) = -0.567
+
+H4  [tesla_t4_float16] predicted joint vs sequential
+    tol 0.02  joint a=0.995 1.422x | sequential a=0.995 1.387x | ratio 1.025 | fc chain 1.315x | sequoia 1.234x
+    tol 0.05  joint a=0.995 1.422x | sequential a=0.995 1.387x | ratio 1.025 | fc chain 1.315x | sequoia 1.234x
+    tol 0.1   joint a=0.995 1.422x | sequential a=0.995 1.387x | ratio 1.025 | fc chain 1.315x | sequoia 1.234x
+
+H2  [tesla_t4_float32] optimal tree vs alpha
+    alpha 0.0: n=  2 d= 1 widths=[1, 1] G=1.67 pred. speedup 1.369
+    alpha 0.1: n=  2 d= 1 widths=[1, 1] G=1.67 pred. speedup 1.369
+    alpha 0.2: n=  2 d= 1 widths=[1, 1] G=1.67 pred. speedup 1.372
+    alpha 0.3: n=  2 d= 1 widths=[1, 1] G=1.67 pred. speedup 1.376
+    alpha 0.5: n=  2 d= 1 widths=[1, 1] G=1.68 pred. speedup 1.380
+    alpha 0.7: n=  2 d= 1 widths=[1, 1] G=1.69 pred. speedup 1.389
+    alpha 0.9: n=  2 d= 1 widths=[1, 1] G=1.69 pred. speedup 1.392
+    alpha 0.92: n=  2 d= 1 widths=[1, 1] G=1.70 pred. speedup 1.399
+    alpha 0.95: n=  2 d= 1 widths=[1, 1] G=1.72 pred. speedup 1.411
+    alpha 0.97: n=  2 d= 1 widths=[1, 1] G=1.72 pred. speedup 1.416
+    alpha 0.99: n=  3 d= 2 widths=[1, 1, 1] G=2.36 pred. speedup 1.483
+    alpha 0.995: n= 21 d= 5 widths=[1, 2, 3, 4, 5, 6] G=4.45 pred. speedup 1.542
+    alpha 0.998: n= 21 d= 5 widths=[1, 2, 3, 4, 5, 6] G=4.68 pred. speedup 1.624
+    alpha 0.999: n= 28 d= 6 widths=[1, 2, 3, 4, 5, 6, 7] G=5.45 pred. speedup 1.701
+    alpha 1.0: n= 16 d=12 widths=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4] G=13.00 pred. speedup 3.221
+    Spearman(alpha, depth) = 0.839   Spearman(alpha, max width) = 0.751
+
+H4  [tesla_t4_float32] predicted joint vs sequential
+    tol 0.02  joint a=0.995 1.542x | sequential a=0.995 1.474x | ratio 1.046 | fc chain 1.493x | sequoia 1.344x
+    tol 0.05  joint a=0.995 1.542x | sequential a=0.995 1.474x | ratio 1.046 | fc chain 1.493x | sequoia 1.344x
+    tol 0.1   joint a=0.995 1.542x | sequential a=0.995 1.474x | ratio 1.046 | fc chain 1.493x | sequoia 1.344x
+
+H3  predicted transfer (row = optimum from, col = run on), first feasible tolerance
+    tesla_t4_float16   1.422 (+0.0%) | 1.435 (-7.0%)
+    tesla_t4_float32   1.374 (-3.4%) | 1.542 (-0.0%)
+
+Measured [tesla_t4_float16] e2e_tesla_t4_float16_pythia-2.8b__pythia-160m_cnndm.json  (n=100 prompts x 3 passes)
+    ar                         36.53 ms/tok  speedup 1.000  pred 1.000  tok/step 1.00  Q 0.0492 [0.0346, 0.0649]
+    chain3                     31.76 ms/tok  speedup 1.150  pred 1.262  tok/step 2.21  Q 0.0490 [0.0310, 0.0697]
+    chain5                     37.95 ms/tok  speedup 0.963  pred 1.053  tok/step 2.45  Q 0.0423 [0.0286, 0.0567]
+    chain7                     44.87 ms/tok  speedup 0.814  pred 0.876  tok/step 2.56  Q 0.0379 [0.0254, 0.0518]
+    sequoia                    26.71 ms/tok  speedup 1.368  pred 1.486  tok/step 2.33  Q 0.0402 [0.0261, 0.0563]
+    joint_tol0.02              24.66 ms/tok  speedup 1.481  pred 1.768  tok/step 3.29  Q 0.0496 [0.0371, 0.0642]
+    seq_tol0.02                26.01 ms/tok  speedup 1.405  pred 1.714  tok/step 2.70  Q 0.0415 [0.0306, 0.0545]
+    fc_chain_tol0.02           27.02 ms/tok  speedup 1.352  pred 1.606  tok/step 2.80  Q 0.0402 [0.0288, 0.0530]
+    joint_tol0.05              24.66 ms/tok  speedup 1.481  pred 1.768  tok/step 3.29  Q 0.0496 [0.0371, 0.0642]
+    seq_tol0.05                26.01 ms/tok  speedup 1.405  pred 1.714  tok/step 2.70  Q 0.0415 [0.0306, 0.0545]
+    fc_chain_tol0.05           27.02 ms/tok  speedup 1.352  pred 1.606  tok/step 2.80  Q 0.0402 [0.0288, 0.0530]
+    joint_tol0.1               24.66 ms/tok  speedup 1.481  pred 1.768  tok/step 3.29  Q 0.0496 [0.0371, 0.0642]
+    seq_tol0.1                 26.01 ms/tok  speedup 1.405  pred 1.714  tok/step 2.70  Q 0.0415 [0.0306, 0.0545]
+    fc_chain_tol0.1            27.02 ms/tok  speedup 1.352  pred 1.606  tok/step 2.80  Q 0.0402 [0.0288, 0.0530]
+    wrote report/tables/e2e_tesla_t4_float16_pythia-2.8b__pythia-160m_cnndm.tex
+    H4 joint_tol0.02 vs seq_tol0.02: sequential - joint = +1.41 ms/tok [+1.02, +1.79] -> joint faster
+    H4 joint_tol0.05 vs seq_tol0.05: sequential - joint = +1.41 ms/tok [+1.02, +1.79] -> joint faster
+    H4 joint_tol0.1 vs seq_tol0.1: sequential - joint = +1.41 ms/tok [+1.02, +1.79] -> joint faster
+    siblings unused (first child accepted at branching nodes) sequoia                0.63
+    siblings unused (first child accepted at branching nodes) joint_tol0.02          0.79
+    siblings unused (first child accepted at branching nodes) seq_tol0.02            0.79
+    siblings unused (first child accepted at branching nodes) joint_tol0.05          0.79
+    siblings unused (first child accepted at branching nodes) seq_tol0.05            0.79
+    siblings unused (first child accepted at branching nodes) joint_tol0.1           0.79
+    siblings unused (first child accepted at branching nodes) seq_tol0.1             0.79
+
+Measured [tesla_t4_float32] e2e_tesla_t4_float32_pythia-2.8b__pythia-160m_cnndm.json  (n=100 prompts x 3 passes)
+    ar                         50.03 ms/tok  speedup 1.000  pred 1.000  tok/step 1.00  Q 0.0469 [0.0329, 0.0626]
+    chain3                     42.46 ms/tok  speedup 1.178  pred 1.173  tok/step 2.22  Q 0.0474 [0.0339, 0.0638]
+    chain5                     49.49 ms/tok  speedup 1.011  pred 1.018  tok/step 2.45  Q 0.0405 [0.0283, 0.0534]
+    chain7                     64.40 ms/tok  speedup 0.777  pred 0.868  tok/step 2.53  Q 0.0457 [0.0322, 0.0599]
+    sequoia                    41.63 ms/tok  speedup 1.202  pred 1.344  tok/step 1.63  Q 0.0460 [0.0341, 0.0601]
+    joint_tol0.02              36.38 ms/tok  speedup 1.375  pred 1.542  tok/step 4.25  Q 0.0486 [0.0353, 0.0638]
+    seq_tol0.02                42.23 ms/tok  speedup 1.185  pred 1.474  tok/step 1.77  Q 0.0488 [0.0350, 0.0648]
+    fc_chain_tol0.02           35.37 ms/tok  speedup 1.415  pred 1.493  tok/step 2.82  Q 0.0389 [0.0273, 0.0522]
+    joint_tol0.05              36.38 ms/tok  speedup 1.375  pred 1.542  tok/step 4.25  Q 0.0486 [0.0353, 0.0638]
+    seq_tol0.05                42.23 ms/tok  speedup 1.185  pred 1.474  tok/step 1.77  Q 0.0488 [0.0350, 0.0648]
+    fc_chain_tol0.05           35.37 ms/tok  speedup 1.415  pred 1.493  tok/step 2.82  Q 0.0389 [0.0273, 0.0522]
+    joint_tol0.1               36.38 ms/tok  speedup 1.375  pred 1.542  tok/step 4.25  Q 0.0486 [0.0353, 0.0638]
+    seq_tol0.1                 42.23 ms/tok  speedup 1.185  pred 1.474  tok/step 1.77  Q 0.0488 [0.0350, 0.0648]
+    fc_chain_tol0.1            35.37 ms/tok  speedup 1.415  pred 1.493  tok/step 2.82  Q 0.0389 [0.0273, 0.0522]
+    sequoia@tesla_t4_float16   47.41 ms/tok  speedup 1.055  pred 1.234  tok/step 2.34  Q 0.0405 [0.0274, 0.0557]
+    joint_tol0.02@tesla_t4_float16   38.64 ms/tok  speedup 1.295  pred 1.422  tok/step 3.31  Q 0.0460 [0.0349, 0.0594]
+    joint_tol0.05@tesla_t4_float16   38.64 ms/tok  speedup 1.295  pred 1.422  tok/step 3.31  Q 0.0460 [0.0349, 0.0594]
+    joint_tol0.1@tesla_t4_float16   38.64 ms/tok  speedup 1.295  pred 1.422  tok/step 3.31  Q 0.0460 [0.0349, 0.0594]
+    wrote report/tables/e2e_tesla_t4_float32_pythia-2.8b__pythia-160m_cnndm.tex
+    H4 joint_tol0.02 vs seq_tol0.02: sequential - joint = +5.68 ms/tok [+5.06, +6.29] -> joint faster
+    H4 joint_tol0.05 vs seq_tol0.05: sequential - joint = +5.68 ms/tok [+5.06, +6.29] -> joint faster
+    H4 joint_tol0.1 vs seq_tol0.1: sequential - joint = +5.68 ms/tok [+5.06, +6.29] -> joint faster
+    siblings unused (first child accepted at branching nodes) joint_tol0.02          0.80
+    siblings unused (first child accepted at branching nodes) joint_tol0.05          0.80
+    siblings unused (first child accepted at branching nodes) joint_tol0.1           0.80
+    siblings unused (first child accepted at branching nodes) sequoia@tesla_t4_float16 0.64
+    siblings unused (first child accepted at branching nodes) joint_tol0.02@tesla_t4_float16 0.79
+    siblings unused (first child accepted at branching nodes) joint_tol0.05@tesla_t4_float16 0.79
+    siblings unused (first child accepted at branching nodes) joint_tol0.1@tesla_t4_float16 0.79
